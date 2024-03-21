@@ -1,0 +1,540 @@
+---
+title: "Exploring Car Accidents in Barcelona"
+output: html_document
+date: "2024-03-21"
+---
+
+Team members: Viktoriia Yuzkiv, Rui Maciel, Angelo Di Gianvito
+
+
+## Introduction
+
+Living in Barcelona, a city vibrant with life and movement, we are constantly navigating its streets, whether on foot, by bike, or in a vehicle. However, amidst its beauty and energy, Barcelona, like any other urban center, grapples with the challenge of road safety. The occurrence of car accidents, ranging from minor collisions to tragic fatalities, underscores the importance of understanding the dynamics of road incidents within the city.
+
+As residents of Barcelona, our team recognizes the necessity of exploring the spatial patterns and factors influencing car accidents. By delving into the distribution of accidents across different districts, examining the severity of injuries and fatalities, and scrutinizing temporal variations, we aim to unearth insights that can inform not only our personal vigilance but also contribute to broader discussions on urban safety measures.
+
+## Research Question
+
+With this context in mind, our research question emerges: What are the spatial, temporal, and environmental determinants of car accidents in Barcelona? Through this inquiry, we seek to elucidate whether there are distinct patterns in accident occurrence across districts, whether certain months exhibit higher accident rates, and whether there exists a correlation between accident frequency and proximity to essential infrastructures like crosswalks. By answering these questions, we endeavor to provide actionable insights for enhancing road safety strategies and fostering a more secure urban environment for all residents and visitors of Barcelona.
+
+
+## Literature review
+
+TODO (should be very short)
+
+
+## Set up the environment
+
+Clean the environment and set the working directory:
+```{r }
+# Clean the environment
+rm(list = ls(all.names = TRUE))
+
+# Set the working directory to the location of the Geospatial data
+setwd("/Users/viktoriia/Desktop/BSE/Term 2/Geospatial/Geo_takehome_exam/")
+```
+
+Load necessary libraries:
+```{r include=FALSE}
+# Import libraries
+library(sf, quietly = TRUE)         # For handling spatial data
+library(ggplot2, quietly = TRUE)    # For plotting
+library(raster, quietly = TRUE)     # For creating raster data
+library(terra, quietly = TRUE)      # For spatial data manipulation, similar to raster but more recent
+library(dplyr, quietly = TRUE)      # For data manipulation
+library(viridis, quietly = TRUE)
+```
+
+
+```{r }
+# Load the data
+districts_data <- read.csv('BarcelonaCiutat_Districtes.csv')
+accidents_data <- read.csv('2023_accidents_gu_bcn (1).csv')
+
+# Convert districts and accidents data to sf objects
+districts_sf <- st_as_sf(districts_data, wkt = "geometria_wgs84", crs = 4326)
+accidents_sf <- st_as_sf(accidents_data, coords = c("Longitud_WGS84", "Latitud_WGS84"), crs = 4326)
+```
+
+## Data
+
+TODO: what is the datasource and what is the data? are these all accidents in 2023? + Short summary statistics
+
+```{r }
+dim(accidents_data)
+```
+
+In 2023, there were 7724 traffic accidents in the city. 
+
+```{r }
+head(accidents_data)
+```
+
+TODO: comment on what data is available in the dataset
+
+
+## What is the distribution of car accidents across the city?
+
+To deepen our understanding of the spatial distribution of car accidents across Barcelona, let's explore the total number of incidents within each district. This analysis offers valuable insights into how accidents are distributed across the city's different areas, shedding light on potential hotspots and areas of concern.
+
+```{r }
+
+# Filter out -1 values from Codi_districte
+accidents_data <- accidents_data %>%
+  filter(Codi_districte != -1)
+
+# Aggregate the number of accidents by district
+accidents_agg <- accidents_data %>%
+  group_by(Codi_districte) %>%
+  summarize(total_accidents = n())
+
+# Merge the aggregated data with districts_sf
+districts_sf_joined <- left_join(districts_sf, accidents_agg, by = c("codi_districte" = "Codi_districte"))
+
+# Plot the data
+ggplot() +
+  geom_sf(data = districts_sf_joined, aes(fill = total_accidents), color = 'black') +  # Plot districts
+  geom_sf_label(data = districts_sf_joined, aes(label = nom_districte), size = 3, label.padding = unit(0.25, "lines"), fontface = "bold") + # Add district names
+  scale_fill_viridis(option = "viridis", discrete=FALSE, name = "Accident Count", labels = scales::comma) + 
+  labs(title = "Total Number of Accidents by District in Barcelona",
+       caption = "Data Source: Open Data BCN") +
+  theme_void() +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5))
+```
+
+The map highlights Eixample as the district with the highest accident count in 2023, followed by Sant Martí, Sarrià-Sant Gervasi, and Sants-Montjuïc, each experiencing approximately 2.3 to 2.6 times fewer accidents. This emphasizes the need for targeted interventions and increased awareness in high-risk areas to improve overall road safety in Barcelona.
+
+
+Additionally, plotting a heatmap instead of aggregating by district could offer further insights into the most frequent areas of accidents.
+
+```{r }
+# Define the extent based on the accidents data
+ext <- st_bbox(accidents_sf)
+r_extent <- raster::extent(ext$xmin, ext$xmax, ext$ymin, ext$ymax)
+
+# Define resolution
+res <- 0.002 # Adjust resolution based on your dataset
+
+# Calculate the number of rows and columns based on the resolution
+num_rows <- ceiling((ext$ymax - ext$ymin) / res)
+num_cols <- ceiling((ext$xmax - ext$xmin) / res)
+
+# Create an empty raster with defined extent and resolution
+r <- raster::raster(nrows=num_rows, ncols=num_cols, xmn=ext$xmin, xmx=ext$xmax, ymn=ext$ymin, ymx=ext$ymax)
+
+# Set the resolution of the raster
+res(r) <- c(res, res)
+
+# Rasterize the accidents data
+accidents_raster <- rasterize(x=accidents_sf, y=r, field=1, fun='count', background=0)
+
+# Convert the raster to a dataframe
+accidents_df <- as.data.frame(accidents_raster, xy=TRUE)
+
+# Replace NA with 0 if any NAs are present
+if(any(is.na(accidents_df$value))) {
+  accidents_df$value[is.na(accidents_df$value)] <- 0
+}
+
+# Proceed to plot the heatmap
+ggplot() +
+  geom_tile(data = accidents_df, aes(x = x, y = y, fill = layer)) +  # Heatmap of accidents
+  geom_sf(data = districts_sf, fill = NA, color = "black", size = 0.2) +  # Boundaries of districts
+  scale_fill_gradient(low = "white", high = "red", name = "Accident Count") +
+  coord_sf(datum = NA) +  # Use coord_sf to align the plot with the sf data
+  labs(title = "Heatmap of Accidents in Barcelona with District Boundaries",
+       caption = "Data Source: Open Data BCN") +
+  theme_void() +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5))
+```
+
+The heatmap notably reveals a higher concentration of accidents on major roads such as Av. Diagonal and Gran Via de les Corts Catalanes.
+
+
+## Does the number of accidents change depending on the time of day/the month?
+
+### Time of the day
+
+```{r }
+# Aggregate the number of accidents by district and hour of the day
+accidents_agg <- accidents_data %>%
+  group_by(Codi_districte, Hora_dia) %>%
+  summarize(total_accidents = n())
+
+# Merge the aggregated data with districts_sf
+districts_sf_joined <- left_join(districts_sf, accidents_agg, by = c("codi_districte" = "Codi_districte"))
+
+# Plot the data
+ggplot() +
+  geom_sf(data = districts_sf_joined, aes(fill = total_accidents), color = 'black') +  # Plot districts
+  scale_fill_viridis(option = "viridis", discrete=FALSE, name = "Accident Count", labels = scales::comma) + 
+  labs(title = "Total Number of Accidents by District and Hour in Barcelona",
+       caption = "Data Source: Open Data BCN") +
+  theme_void() +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5)) +
+  facet_wrap(~Hora_dia, ncol = 6) # Facet plot by hour of the day
+```
+
+```{r }
+# Aggregate the number of accidents by district name and hour of the day
+accidents_agg_names <- accidents_data %>%
+  group_by(Nom_districte, Hora_dia) %>%
+  summarize(total_accidents = n())
+
+# Plot the line plot for number of accidents by hour
+ggplot(accidents_agg_names, aes(x = Hora_dia, y = total_accidents, color = factor(Nom_districte))) +
+  geom_line() +
+  scale_color_viridis_d() + # Apply viridis color scheme
+  labs(title = "Number of Accidents by Hour of the Day",
+       x = "Hour of the Day",
+       y = "Number of Accidents",
+       color = "District",
+       caption = "Data Source: Open Data BCNl") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5))
+```
+```{r }
+# Number of accidents by hour
+accidents_data %>%
+  group_by(Hora_dia) %>%
+  summarize(total_accidents = n()) %>%
+  arrange(desc(total_accidents))
+```
+
+
+As expected, the number of accidents decreases during the night. Notably, in Eixample, the number of accidents during the night is much lower than during the day and is comparable to the levels in other districts. Interestingly, in Eixample, the number of accidents decreases at 15:00 and then rises again, reaching its peak at 18:00. The highest number of accidents in 2023 occurred at 14:00. It turns out that, generally, there are fewer accidents at 15:00 compared to the hours immediately before and after it.
+
+### Month
+
+```{r }
+# Aggregate the number of accidents by district and hour of the day
+accidents_agg_month <- accidents_data %>%
+  group_by(Codi_districte, Mes_any) %>%
+  summarize(total_accidents = n())
+
+# Merge the aggregated data with districts_sf
+districts_sf_joined_month <- left_join(districts_sf, accidents_agg_month, by = c("codi_districte" = "Codi_districte"))
+
+# Plot the data
+ggplot() +
+  geom_sf(data = districts_sf_joined_month, aes(fill = total_accidents), color = 'black') +  # Plot districts
+  scale_fill_viridis(option = "viridis", discrete=FALSE, name = "Accident Count", labels = scales::comma) + 
+  labs(title = "Total Number of Accidents by District and Month in Barcelona",
+       caption = "Data Source: Open Data BCN") +
+  theme_void() +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5)) +
+  facet_wrap(~Mes_any, ncol = 4) # Facet plot by hour of the day
+```
+
+```{r }
+# Aggregate the number of accidents by district name and hour of the day
+accidents_agg_names_month <- accidents_data %>%
+  group_by(Nom_districte, Mes_any) %>%
+  summarize(total_accidents = n())
+
+# Plot the line plot for number of accidents by hour
+ggplot(accidents_agg_names_month, aes(x = Mes_any, y = total_accidents, color = factor(Nom_districte))) +
+  geom_line() +
+  scale_color_viridis_d() + # Apply viridis color scheme
+  labs(title = "Number of Accidents by Month",
+       x = "Month",
+       y = "Number of Accidents",
+       color = "District",
+       caption = "Data Source: Open Data BCN") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5))
+```
+
+
+```{r }
+# Number of accidents by month
+accidents_data %>%
+  group_by(Mes_any) %>%
+  summarize(total_accidents = n()) %>%
+  arrange(desc(total_accidents))
+```
+
+TODO: if we decide to keep this part, add a comment!
+
+Summer months exibit the highest number of accidents...
+
+
+## Severity of injuries
+
+Given our primary concern for human life, it's crucial to assess whether there are any areas where accidents pose a greater threat to safety.
+
+Columns we will check:
+1. Numero_morts - the number of fatalities
+2. Numero_lesionats_lleus - the number of minor injuries
+3. Numero_lesionats_greus - the number of serious injuries
+4. Numero_victimes - the total number of victims
+
+```{r }
+# Print the summary (total count) for each column
+total_sum <- c(
+  Numero_morts = sum(accidents_data$Numero_morts),
+  Numero_lesionats_lleus = sum(accidents_data$Numero_lesionats_lleus),
+  Numero_lesionats_greus = sum(accidents_data$Numero_lesionats_greus),
+  Numero_victimes = sum(accidents_data$Numero_victimes)
+)
+
+# Print the total sum for each column
+print(total_sum)
+```
+
+
+In 2023, a total of 8,708 individuals were involved in car accidents. Among them, 21 tragically lost their lives, while 227 sustained serious injuries. Fortunately, the majority of incidents resulted in minor injuries, with 8,460 individuals affected.
+
+### Are there any specific areas that have more fatalities?
+
+```{r }
+# Filter the dataset
+accidents_with_fatalities <- accidents_sf[accidents_sf$Numero_morts > 0, ]
+
+# Plot the data using ggplot2
+ggplot() +
+  geom_sf(data = districts_sf, fill = 'white', color = 'black') +  # Plot districts
+  geom_sf(data = accidents_with_fatalities, color = 'red', size = 1.5, alpha = 1) + # Plot accidents
+  theme_void() +
+  labs(title = "Accidents with Fatalities",
+       caption = "Data Source: Open Data BCN") +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5))
+```
+
+Surprisingly, despite Eixample having the highest number of accidents, the number of fatalities is lower than in some other districts.
+
+
+TODO (for Rui): add roads on the map above and comment if accidents with fatalities happen more often on the big roads
+
+
+### What about serious injuries? 
+
+
+```{r }
+# Filter the dataset
+accidents_with_serious_injuries <- accidents_sf[accidents_sf$Numero_lesionats_greus > 0, ]
+
+# Plot the data using ggplot2
+ggplot() +
+  geom_sf(data = districts_sf, fill = 'white', color = 'black') +  # Plot districts
+  geom_sf(data = accidents_with_serious_injuries, color = 'red', size = 1.5, alpha = 0.7) + # Plot accidents
+  theme_void() +
+  labs(title = "Accidents with Serious Injuries",
+       caption = "Data Source: Open Data BCN") +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5))
+```
+
+
+TODO: add roads as well, comment that there are some hotspots in Eixample.
+
+
+### And what about minor injuries?
+
+Given that the majority of accidents result in minor injuries, it does not make much sense to look at the absolute number of accidents by areas, but instead it would be useful to examine the areas with the lowest and highest rates of injuries per accident.
+
+```{r }
+# Calculate the total number of accidents by district
+accidents_by_district <- accidents_data %>%
+  group_by(Nom_districte, Codi_districte) %>%
+  summarize(total_accidents = n())
+
+# Calculate the total number of minor injuries by district
+injuries_by_district <- accidents_data %>%
+  group_by(Nom_districte) %>%
+  summarize(total_minor_injuries = sum(Numero_lesionats_lleus, na.rm = TRUE))
+
+# Merge the two datasets by district code
+injuries_rate_by_district <- merge(accidents_by_district, injuries_by_district, by = "Nom_districte")
+
+# Calculate the rate of injuries per accident by district
+injuries_rate_by_district$injuries_per_accident <- injuries_rate_by_district$total_minor_injuries / injuries_rate_by_district$total_accidents
+
+# Sort the data by injuries_per_accident in descending order
+injuries_rate_by_district <- injuries_rate_by_district %>%
+  arrange(desc(injuries_per_accident))
+
+# Check how the data looks like
+head(injuries_rate_by_district)
+```
+
+
+```{r }
+# Merge the aggregated data with districts_sf
+districts_sf_injuries <- left_join(districts_sf, injuries_rate_by_district, by = c("codi_districte" = "Codi_districte"))
+
+# Plot the data
+ggplot() +
+  geom_sf(data = districts_sf_injuries, aes(fill = injuries_per_accident), color = 'black') +  # Plot districts
+  geom_sf_label(data = districts_sf_joined, aes(label = nom_districte), size = 3, label.padding = unit(0.25, "lines"), fontface = "bold") + # Add district names
+  scale_fill_viridis(option = "viridis", discrete=FALSE, name = "Injuries per Accident", labels = scales::comma) + 
+  labs(title = "Minor Injuries Rate by District",
+       caption = "Data Source: Open Data BCN") +
+  theme_void() +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5))
+```
+
+
+Interestingly, the Nou Barris district has one of the lowest numbers of accidents, yet simultaneously records the highest level of injuries per accident. Similarly, Sant Marti had a comparatively low number of accidents, but the number of injuries per accident is high. Here, Eixample is in third place for the number of minor injuries per accident.
+
+Since districts are very large in Barcelona, perhaps examining the neighborhoods will help uncover additional insights.
+
+```{r }
+# Calculate the total number of accidents by neighborhoods
+accidents_by_nbh <- accidents_data %>%
+  group_by(Nom_barri, Codi_barri) %>%
+  summarize(total_accidents = n())
+
+# Calculate the total number of minor injuries by neighborhoods
+injuries_by_nbh <- accidents_data %>%
+  group_by(Nom_barri) %>%
+  summarize(total_minor_injuries = sum(Numero_lesionats_lleus, na.rm = TRUE))
+
+# Merge the two datasets
+injuries_rate_by_nbh <- merge(accidents_by_nbh, injuries_by_nbh, by = "Nom_barri")
+
+# Calculate the rate of injuries per accident by neighborhoods
+injuries_rate_by_nbh$injuries_per_accident <- injuries_rate_by_nbh$total_minor_injuries / injuries_rate_by_nbh$total_accidents
+
+# Sort the data by injuries_per_accident in descending order
+injuries_rate_by_nbh <- injuries_rate_by_nbh %>%
+  arrange(desc(injuries_per_accident))
+
+# Check how the data looks like
+head(injuries_rate_by_nbh)
+```
+
+
+```{r }
+# Load neighbourhoods (barris) map
+barris_data <- read.csv('BarcelonaCiutat_Barris.csv')
+barris_sf <- st_as_sf(barris_data, wkt = "geometria_wgs84", crs = 4326)
+
+# Merge the aggregated data with barris_sf
+barris_sf_injuries <- left_join(barris_sf, injuries_rate_by_nbh, by = c("codi_barri" = "Codi_barri"))
+
+# Plot the data
+ggplot() +
+  geom_sf(data = barris_sf_injuries, aes(fill = injuries_per_accident), color = 'grey') +  # Plot barris
+  geom_sf(data = districts_sf, color = 'black', fill=NA) +  # Add districts borders
+  scale_fill_viridis(option = "viridis", discrete=FALSE, name = "Injuries per Accident", labels = scales::comma) + 
+  labs(title = "Minor Injuries Rate by Neighbourhood",
+       caption = "Data Source: Open Data BCN") +
+  theme_void() +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        plot.caption = element_text(size = 8, hjust = 0.5))
+
+
+```
+
+TODO: comment
+
+## Determine whether the distance to the cross walks is a significant explanatory factor for the number of accidents
+
+Crosswalks could lead to more car accidents on the road, and we are going to test if this holds true in Barcelona.
+
+### Crosswalks
+
+```{r }
+# Load crosswalks data
+crosswalks_data <- read.csv('Infraestructures_Inventari_Pas_Vianants.csv')
+
+# Filter out records where Data_Alta is greater than January 1, 2024 and Data_Baixa is smaller than January 1, 2023 so that we keep the crosswalks that were active in 2023
+crosswalks_data <- crosswalks_data %>%
+  filter(Data_Alta < as.Date("2024-01-01")) %>%
+  filter(Data_Baixa == "" | Data_Baixa >= as.Date("2023-01-01"))
+
+crosswalks_sf <- st_as_sf(crosswalks_data, coords = c("Longitud", "Latitud"), crs = 4326)
+
+# Calculate distances between each accident point and all crosswalk points
+distances <- st_distance(accidents_sf, crosswalks_sf)
+
+# Find the minimum distance for each accident point
+min_distances <- apply(distances, 1, min)
+
+# Add the minimum distances to the accidents_sf dataset
+accidents_sf$closest_crosswalk_distance <- min_distances
+```
+
+Remove outliers from the closest_crosswalk_distance column:
+
+```{r }
+# Calculate the first and third quartiles
+q1 <- quantile(accidents_sf$closest_crosswalk_distance, 0.25)
+q3 <- quantile(accidents_sf$closest_crosswalk_distance, 0.75)
+
+# Calculate the interquartile range (IQR)
+iqr <- q3 - q1
+
+# Define the lower and upper bounds for outliers
+lower_bound <- q1 - 1.5 * iqr
+upper_bound <- q3 + 1.5 * iqr
+
+# Remove outliers
+accidents_sf_trimmed <- subset(accidents_sf, closest_crosswalk_distance >= lower_bound & closest_crosswalk_distance <= upper_bound)
+```
+
+
+Now, let's plot the relationship and fit a linear model to see if there is a potential relationship:
+
+```{r }
+# Group data by Codi_barri and calculate count of accidents and average closest_crosswalk_distance
+grouped_data <- accidents_sf_trimmed %>%
+  group_by(Codi_barri) %>%
+  summarize(total_accidents = n(),
+            avg_distance = mean(closest_crosswalk_distance, na.rm = TRUE))
+
+# Run linear regression
+linear_model <- lm(total_accidents ~ avg_distance, data = grouped_data)
+
+# Add regression line to the scatter plot
+scatter_with_regression <- ggplot(grouped_data, aes(x = avg_distance, y = total_accidents)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +  # Add linear regression line
+  labs(title = "Total Accidents vs. Closest Crosswalk Distance",
+       x = "Average Closest Crosswalk Distance",
+       y = "Total Accidents") +
+  theme_minimal()
+
+# Print the scatter plot with regression line
+print(scatter_with_regression)
+```
+
+```{r }
+# Print summary of linear regression
+summary(linear_model)
+```
+
+Based on the results of the linear regression above, the coefficient for avg_distance is negative (-2.812), indicating that, on average, as the average distance to the closest crosswalk increases, the predicted number of accidents decreases (significant at the 5% significance level). This suggests that, according to the model, areas farther away from crosswalks tend to have less car accidents. However, it's essential to interpret this result with caution and remember that =factors such as road conditions, traffic flow, visibility, and driver behavior may also play significant roles in accident occurrence.
+
+
+## Traffic level
+
+Since in the charts above we saw that there are more accidents on bigger streets, we are going to look at the trafic level data and test if it is a significant explanatory factor for the number of accidents.
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+
+## Conclusions
+
+
+TODO: summarize the finding
+
+
+
