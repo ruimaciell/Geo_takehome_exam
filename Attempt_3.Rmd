@@ -1,29 +1,26 @@
 ---
-title: "How Do Various Factors Influence Urban Road Safety in Barcelona?"
-output: html_document
-date: "2024-03-21"
-#bibliography: references.bib
+title: "How Do Various Factors Influence Urban Road Safety in Barcelona?/ Geospatial Patterns of Road Safety in Barcelona"
+author: "Angelo Di Gianvito, Rui Maciel, Viktoriia Yuzkiv"
+output:
+  html_document:
+    toc: true
+    theme: united
+date: "2024-03-28"
 ---
-
-Team members: Viktoriia Yuzkiv, Rui Maciel, Angelo Di Gianvito
-
-
-## Introduction
+  
+# 1. Introduction
 
 Living in Barcelona, a city vibrant with life and movement, we are constantly navigating its streets, whether on foot, by bike, or in a vehicle. However, amidst its beauty and energy, Barcelona, like any other urban center, grapples with the challenge of road safety. The occurrence of car accidents, ranging from minor collisions to tragic fatalities, underscores the importance of understanding the dynamics of road incidents within the city.
 
-Using geospatial data and approach, our research proposal has the goal of giving an overview of the accidents paradigm of Barcelona. We use data provided by the Guardia Civil, which locates precisely the location of accidents. Afterwards, using geospatial features of the urban life, such as location of crosswalks, traffic patterns we aim to contribute to the literature by identifying non-human behaviour causes to the existence of accidents. Our aim is then, with this findings, to improve the policy making in the urban life of Barcelona, with the ultimate goal of reducing injuries and the cost of human lives.
+As residents of Barcelona, our team recognizes the necessity of exploring the spatial patterns and factors influencing car accidents. By delving into the distribution of accidents across different districts, examining the severity of injuries and fatalities, we aim to unearth insights that can inform not only our personal vigilance but also contribute to broader discussions on urban safety measures.
 
-As residents of Barcelona, our team recognizes the necessity of exploring the spatial patterns and factors influencing car accidents. By delving into the distribution of accidents across different districts, examining the severity of injuries and fatalities, and scrutinizing temporal variations, we aim to unearth insights that can inform not only our personal vigilance but also contribute to broader discussions on urban safety measures.
+Using a geospatial data and approach, our research proposal has the goal of giving an overview of the accidents paradigm of Barcelona and to foster further investigation through geospatial tools. We utilize data provided by the Ayuntamiento de Barcelona, which geospatially pinpoints the exact locations of accidents. 
 
-With this context in mind, our research question emerges: What are the spatial and temporal determinants of car accidents in Barcelona? Through this inquiry, we seek to elucidate whether there are distinct patterns in accident occurrence and number of victims across districts, whether certain months exhibit higher rates, and whether there exists a correlation between accident frequency and proximity to essential infrastructures like crosswalks. By answering these questions, we endeavor to provide actionable insights for enhancing road safety strategies and fostering a more secure urban environment for all residents and visitors of Barcelona.
+This data has enabled us to pinpoint compelling areas for future research, such as pinpointing Eixample as Barcelona's primary accident hotspot and investigating the potential non-linear relationship between the number of accidents and the resultant casualties. Through the analysis of urban geospatial characteristics, such as the closeness to crosswalks and the intensity of traffic patterns, we discovered a notable correlation indicating that accidents are more likely to happen near crosswalks and in zones experiencing higher traffic flow. Additionally, our research proposal concludes with an investigation into whether these factors also influence the number of victims involved.
 
-## Data
+Our goal is to enhance the existing literature by identifying environmental and infrastructural causes of accidents in Barcelona, moving beyond the scope of human behavior. 
 
-Our project uses data provided by the Ayuntamiento de Barcelona through its platform "Open Data BCN".
-
-
-## Literature review
+# 2. State of Art
 
 The integration of geospatial features into the study and prediction of road traffic accidents (RTAs) has marked a significant evolution in the field of urban planning and public safety. Through the examination of various research findings, it becomes evident that geospatial data is pivotal in uncovering the relations between urban environments and accident occurrences. 
 
@@ -33,11 +30,21 @@ Moreover, the spatial-temporal variability highlighted in the research, such as 
 
 Additionally, the application of geospatial data extends beyond traditional analysis, as demonstrated by the use of machine learning models to predict RTA risks. Shi et al. (2021) incorporated geospatial features into machine learning models, offering a granular geospatial view of accident probabilities across urban road networks. This approach represents a forward leap in predictive analytics, providing a tool for preemptive safety planning and risk assessment at the road segment level.
 
-In summary, by enabling the precise identification of high-risk areas and the factors contributing to accidents, geospatial analysis serves as a cornerstone for developing targeted, data-driven interventions. These advancements underscore the potential of geospatial data to revolutionize the way cities approach the challenge of reducing RTAs, ultimately contributing to safer and more resilient urban environments. 
+Building on this foundation, this literature review has underscored the indispensable role of geospatial data in understanding the dynamics between urban features and road traffic accidents, particularly in pinpointing accident hotspots. Inspired by the comprehensive analysis presented in the Barcelona study (Chaudhuri et al. (2023)), we aim to delve deeper into the influence of geospatial characteristics on accident causation. This project not only seeks to identify prevailing patterns and contributing factors but also to uncover new insights that could stimulate further research. By extending the application of geospatial analysis, we hope to contribute to the body of knowledge with nuanced findings that could guide the development of more effective urban safety measures and traffic management strategies.
 
-Papers to cite (This is a draft. Papers that were cited will be added afterwards after this has been done. )
+# 3. Data
 
+Our project utilizes data sourced from the "Open Data BCN" platform, provided by the Ayuntamiento de Barcelona. The datasets incorporated into our research include:
 
+**Traffic Accident Data for 2023**: Accessible at https://opendata-ajuntament.barcelona.cat/data/en/dataset/accidents_causa_conductor_gu_bcn, this dataset comprises 7,724 records, detailing each traffic incident comprehensively. A critical aspect of this dataset is the precise accident locations, pivotal for our analysis—from calculating distances to integrating with other spatial data. Additionally, it offers detailed categorizations of injuries and fatalities, serving as the dependent variables in our study.
+
+**Barcelona District Boundaries**: Available at https://opendata-ajuntament.barcelona.cat/data/en/dataset/20170706-districtes-barris/resource/576bc645-9481-4bc4-b8bf-f5972c20df3f, this resource delineates the boundaries of Barcelona's districts, integral to spatially orienting our analysis within the city's administrative divisions.
+
+**Inventory of Crosswalks in Barcelona**: Retrieved from https://opendata-ajuntament.barcelona.cat/data/ca/dataset/infraestructures-inventari-pas-vianants, this dataset catalogs every crosswalk in Barcelona, emphasizing their exact locations. The comprehensive detailing of crosswalks supports our exploration of pedestrian safety and mobility patterns.
+
+**Traffic Flow Data**: Sourced from https://opendata-ajuntament.barcelona.cat/data/en/dataset/trams, it provides traffic volume information across various city streets, captured in 15-minute intervals. This temporal granularity allows for a dynamic understanding of traffic flow, enriching our analysis with temporal traffic patterns.
+
+Leveraging these differents datasets, we aim to not only apply the methodologies and tools explored in our coursework but also to delve into the application of geospatial analysis in the context of traffic accidents. This approach will not only enrich the understanding of urban safety dynamics but also pave the way for future research, showcasing the potential of geospatial technologies in addressing complex urban challenges. Let's, then, explore the primary dataset that will form the basis of our analysis.
 
 ```{r include=FALSE}
 ## Clean the environment and set the working directory
@@ -46,8 +53,8 @@ Papers to cite (This is a draft. Papers that were cited will be added afterwards
 rm(list = ls(all.names = TRUE))
 
 # Set the working directory to the location of the Geospatial data
-#setwd("/Users/ruimaciel/Desktop/Barcelona/Geospatial/Geo_takehome_exam")
-setwd("/Users/viktoriia/Desktop/BSE/Term 2/Geospatial/Geo_takehome_exam")
+setwd("/Users/ruimaciel/Desktop/Barcelona/Geospatial/Geo_takehome_exam")
+#setwd("/Users/viktoriia/Desktop/BSE/Term 2/Geospatial/Geo_takehome_exam")
 ```
 
 
@@ -64,10 +71,10 @@ library(readr, quietly = TRUE)      # For read_csv
 library(lubridate, quietly = TRUE)  # For date-time conversion
 library(sandwich, quietly = TRUE)
 library(lmtest, quietly = TRUE)
+library(purrr, quietly = TRUE)
+
 ```
 
-
-## Data
 
 ```{r }
 # Load the data
@@ -92,15 +99,14 @@ accidents_data <- accidents_data %>%
 head(accidents_data)
 ```
 
-The dataset includes detailed information on car accidents, such as precise coordinates and metadata like geospatial characteristics (district, neighborhood, street) and time characteristics (month, day, hour). It also provides data on the number of victims categorized by severity (fatalities, serious injuries, minor injuries). This allows us to analyze the spatial and temporal distribution of accidents and understand the impact on human casualties.
+The main dataset includes detailed information on car accidents, such as precise coordinates and metadata like geospatial characteristics (district, neighborhood, street) and time characteristics (month, day, hour). It also provides data on the number of victims categorized by severity (fatalities, serious injuries, minor injuries). This allows us to analyze the spatial and temporal distribution of accidents and understand the impact on human casualties.
 
 
-## 1. Understanding the accident landscape
+# 4. Understanding Accidents and Number of Victims relation
+
+## 4.1. Understanding the accident landscape
 
 In this section, we delve into the data regarding the frequency and distribution of car accidents in Barcelona. Utilizing the heatmap and district-level map, we aim to visualize the concentration of incidents across the city, providing an overview of the accident landscape. This analysis offers valuable insights into how accidents are distributed across the city's different areas, shedding light on potential hotspots and areas of concern.
-
-
-### Exploring the number of accidents
 
 ```{r }
 # Aggregate the number of accidents by district
@@ -121,9 +127,11 @@ ggplot() +
   theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
 ```
 
-The map highlights Eixample as the district with the highest accident count in 2023, followed by Sant Martí, Sarrià-Sant Gervasi, and Sants-Montjuïc, each experiencing approximately 2.3 to 2.6 times fewer accidents. This emphasizes the need for targeted interventions and increased awareness in high-risk areas to improve overall road safety in Barcelona.
+The map denotes Eixample as the epicenter of road traffic accidents within Barcelona for the year 2023, with accident occurrences markedly higher than in neighboring districts such as Sant Martí, Sarrià-Sant Gervasi, and Sants-Montjuïc, which report about 2.3 to 2.6 times fewer incidents. This concentration of accidents in Eixample could likely be a result of it being the center of critical transit routes, including the major sections of Avenida Diagonal and Gran Via de les Corts Catalanes. 
 
-Additionally, plotting a heatmap instead of aggregating by district could offer further insights into the most frequent areas of accidents.
+Conversely, districts like Gràcia and Ciutat Vella register fewer accidents, which might be attributed to their narrower streets that naturally temper traffic flow and, by extension, potential accidents. The restricted roadways in these areas discourage heavy vehicle circulation, contributing to a lower accident rate. 
+
+To validate these observations and refine our understanding of the underlying causes, a thorough analysis of the traffic data and street layouts in these districts will be essential. Additionally, plotting a heatmap instead of aggregating by district could offer further insights into the most frequent areas of accidents.
 
 ```{r }
 # Define the extent based on the accidents data
@@ -131,7 +139,7 @@ ext <- st_bbox(accidents_sf)
 r_extent <- raster::extent(ext$xmin, ext$xmax, ext$ymin, ext$ymax)
 
 # Define resolution
-res <- 0.002 # Adjust resolution based on your dataset
+res <- 0.002 # Adjust resolution based on the dataset
 
 # Calculate the number of rows and columns based on the resolution
 num_rows <- ceiling((ext$ymax - ext$ymin) / res)
@@ -159,24 +167,29 @@ ggplot() +
   geom_tile(data = accidents_df, aes(x = x, y = y, fill = layer)) +  # Heatmap of accidents
   geom_sf(data = districts_sf, fill = NA, color = "black", size = 0.2) +  # Boundaries of districts
   scale_fill_gradient(low = "white", high = "red", name = "Accident Count") +
-  coord_sf(datum = NA) +  # Use coord_sf to align the plot with the sf data
+  coord_sf(datum = NA) +  
   labs(title = "Heatmap of Accidents in Barcelona with District Boundaries") +
   theme_void() +
   theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
 ```
 
-The heatmap notably reveals a higher concentration of accidents on major roads such as Av. Diagonal and Gran Via de les Corts Catalanes.
+
+The heatmap displays accident data for Barcelona, with the district boundaries outlined. The visual pattern of the heatmap suggests that accidents are not distributed evenly across the city but are rather concentrated along certain roadways, which become evident even without explicitly plotting them. For instance, major routes like Avenida Diagonal and Gran Via de les Corts Catalanes show up prominently due to the high number of accidents, highlighting them as high-risk areas.
+
+Furthermore, the central area of the city, which is likely to correspond with dense traffic and complex intersections, appears as a hotspot with a particularly high frequency of accidents. The heatmap also implies that certain districts have a higher propensity for accidents, which could correlate with factors such as traffic volume, road design, or the presence of commercial zones.
+
+Areas like Eixample stand out with a substantial accumulation of accidents again. This could be attributed to its grid layout, which, while designed to ease traffic flow, may also lead to higher vehicle speeds and increased interactions at intersections, contributing to the higher accident rate observed. The granularity of the data in the heatmap provides an opportunity to delve deeper into specific urban planning and traffic management strategies to enhance road safety in these highlighted areas.
 
 
-### Exploring accident severity
+## 4.2. Exploring accident severity
 
-Given our primary concern for human life, it's crucial to assess whether there are any areas where accidents pose a greater threat to safety.
+Building on our knowledge of accident hotspots, we will next turn our attention to analyzing the most significant consequence of these incidents: the impact on human life and well-being. Where accidents happen may not be necessarily where the human cost is higher. To understand that, we will examine the following key indicators:
 
-Columns we will check:
-1. Numero_morts - the number of fatalities
-2. Numero_lesionats_lleus - the number of minor injuries
-3. Numero_lesionats_greus - the number of serious injuries
-4. Numero_victimes - the total number of victims
+- Fatalities Count (Numero_morts) – representing the toll of lives lost,
+- Minor Injuries Count (Numero_lesionats_lleus) – indicating the frequency of less severe health impacts,
+- Serious Injuries Count (Numero_lesionats_greus) – reflecting more critical health consequences, and
+- Total Victims Count (Numero_victimes) – summarizing the overall human toll.
+By analyzing these metrics, we can identify critical areas that require urgent attention to enhance road safety and protect life.
 
 ```{r }
 # Print the summary (total count) for each column
@@ -191,7 +204,7 @@ total_sum <- c(
 print(total_sum)
 ```
 
-In 2023, a total of 8,708 individuals were involved in car accidents. Among them, 21 tragically lost their lives, while 227 sustained serious injuries. Fortunately, the majority of incidents resulted in minor injuries, with 8,460 individuals affected.
+In 2023, a total of 8,708 individuals were involved in car accidents. Among them, 21 lost their lives, while 227 sustained serious injuries. The majority of incidents resulted in minor injuries, with 8,460 individuals affected.
 
 
 ```{r }
@@ -204,7 +217,7 @@ plot_fatalities <- ggplot() +
   geom_sf(data = accidents_with_fatalities, color = 'red', size = 1.5, alpha = 1) + # Plot accidents
   theme_void() +
   labs(title = "Accidents with Fatalities") +
-  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+  theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5),
         plot.caption = element_text(size = 8, hjust = 0.5))
 
 
@@ -214,68 +227,133 @@ accidents_with_serious_injuries <- accidents_sf[accidents_sf$Numero_lesionats_gr
 # Plot the data using ggplot2
 plot_serious_injuries <- ggplot() +
   geom_sf(data = districts_sf, fill = 'white', color = 'black') +  # Plot districts
-  geom_sf(data = accidents_with_serious_injuries, color = 'red', size = 1.5, alpha = 0.7) + # Plot accidents
+  geom_sf(data = accidents_with_serious_injuries, color = 'red', size = 1, alpha = 0.7) + # Plot accidents
   theme_void() +
   labs(title = "Accidents with Serious Injuries") +
-  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+  theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
 
+# Create a plot using ggplot2
+accidents_with_minor_injuries <- accidents_sf[accidents_sf$Numero_lesionats_lleus > 0, ]
+
+# Plot the data using ggplot2
+plot_minor_injuries <- ggplot() +
+  geom_sf(data = districts_sf, fill = 'white', color = 'black') +  # Plot districts
+  geom_sf(data = accidents_with_minor_injuries, color = 'red', size = 0.01, alpha = 0.7) + # Plot accidents
+  theme_void() +
+  labs(title = "Accidents with Minor Injuries") +
+  theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
 
 # Arrange plots side by side
-grid.arrange(plot_fatalities, plot_serious_injuries, ncol = 2)
+grid.arrange(plot_fatalities, plot_serious_injuries, plot_minor_injuries, ncol = 3)
 ```
 
-Surprisingly, despite Eixample having the highest number of accidents, the number of fatalities is lower than in some other districts. Regarding the serious injuries, it is evident that there are some hotspots in the Eixample destrict.
+While Eixample leads in accident frequency (and even in accidents with serious injuries), it would expect that most of the fatalities would also happen there. Eixample's dense traffic could lead to numerous accidents, yet with outcomes less fatal due to lower speed limits or urban safety designs. This disparity between injury levels and fatalities across accidents suggests influential factors such as vehicle safety features and/or timely medical responses are at play.
 
-
-Given that the majority of accidents result in minor injuries, looking at the absolute number of accidents by areas will not give additional insights, but instead it would be useful to examine the areas with the lowest and highest rates of injuries per accident.
+However, evaluating the sheer number of accidents per district isn't as revealing as assessing the proportion of injuries per accident. This approach would more accurately identify and differentiate the districts on the spectrum from high safety to high risk, providing critical data for targeted, area-specific traffic safety strategies.
 
 ```{r }
+library(purrr)
+
+
+# Assuming accidents_data and districts_sf are pre-loaded datasets
+
 # Calculate the total number of accidents by district
 accidents_by_district <- accidents_data %>%
   group_by(Nom_districte, Codi_districte) %>%
   summarize(total_accidents = n())
 
+# Calculate the total number of serious injuries by district
+serious_injuries_by_district <- accidents_data %>%
+  group_by(Nom_districte) %>%
+  summarize(total_serious_injuries = sum(Numero_lesionats_greus, na.rm = TRUE))
+
 # Calculate the total number of minor injuries by district
-injuries_by_district <- accidents_data %>%
+minor_injuries_by_district <- accidents_data %>%
   group_by(Nom_districte) %>%
   summarize(total_minor_injuries = sum(Numero_lesionats_lleus, na.rm = TRUE))
 
-# Merge the two datasets by district code
-injuries_rate_by_district <- merge(accidents_by_district, injuries_by_district, by = "Nom_districte")
+# Calculate the total number of fatalities by district
+fatalities_by_district <- accidents_data %>%
+  group_by(Nom_districte) %>%
+  summarize(total_fatalities = sum(Numero_morts, na.rm = TRUE))
 
-# Calculate the rate of injuries per accident by district
-injuries_rate_by_district$injuries_per_accident <- injuries_rate_by_district$total_minor_injuries / injuries_rate_by_district$total_accidents
+# Merge datasets
+accidents_summary_by_district <- reduce(list(accidents_by_district, serious_injuries_by_district, minor_injuries_by_district, fatalities_by_district), full_join, by = "Nom_districte")
 
-# Sort the data by injuries_per_accident in descending order
-injuries_rate_by_district <- injuries_rate_by_district %>%
-  arrange(desc(injuries_per_accident))
+# Calculate rates
+accidents_summary_by_district <- accidents_summary_by_district %>%
+  mutate(
+    minor_injuries_per_accident = total_minor_injuries / total_accidents,
+    serious_injuries_per_accident = total_serious_injuries / total_accidents,
+    fatalities_per_accident = total_fatalities / total_accidents
+  )
 
-# Merge the aggregated data with districts_sf
-districts_sf_injuries <- left_join(districts_sf, injuries_rate_by_district, by = c("codi_districte" = "Codi_districte"))
+# Merge with spatial data
+districts_sf_joined <- left_join(districts_sf, accidents_summary_by_district, by = c("nom_districte" = "Nom_districte"))
 
-# Plot the data
-ggplot() +
-  geom_sf(data = districts_sf_injuries, aes(fill = injuries_per_accident), color = 'black') +  # Plot districts
-  geom_sf_label(data = districts_sf_joined, aes(label = nom_districte), size = 3, label.padding = unit(0.25, "lines"), fontface = "bold") + # Add district names
-  scale_fill_viridis(option = "viridis", discrete=FALSE, name = "Injuries per Accident", labels = scales::comma) + 
-  labs(title = "Minor Injuries Rate by District") +
+# Set common theme for all plots
+custom_theme <- function() {
   theme_void() +
-  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+  theme(
+    legend.position = "right",
+    legend.direction = "vertical",
+    legend.title = element_text(size = 6),
+    legend.text = element_text(size = 6),
+    plot.title = element_text(size = 9, face = "bold", hjust = 0.5, vjust = 1),
+    plot.margin = margin(5, 5, 5, 5)  # Adjust the margin numbers (top, right, bottom, left) as needed
+  )
+}
+
+
+# Creating the plot for Minor Injuries
+plot_minor_injuries <- ggplot(data = districts_sf_joined, aes(fill = minor_injuries_per_accident)) +
+  geom_sf(color = 'black') +
+  geom_sf_label(aes(label = nom_districte), fill = "white", size = 1.5, label.padding = unit(0.25, "lines"), fontface = "bold") +
+  scale_fill_viridis(name = "Rate", option = "viridis", discrete = FALSE, labels = scales::comma) +
+  labs(title = "Minor Injuries per Accident") +
+  custom_theme()
+
+# Creating the plot for Serious Injuries
+plot_serious_injuries <- ggplot(data = districts_sf_joined, aes(fill = serious_injuries_per_accident)) +
+  geom_sf(color = 'black') +
+  geom_sf_label(aes(label = nom_districte), fill = "white",size = 1.5, label.padding = unit(0.25, "lines"), fontface = "bold") +
+  scale_fill_viridis(name = "Rate",option = "viridis", discrete = FALSE, labels = scales::comma) +
+  labs(title = "Serious Injuries per Accident") +
+  custom_theme()
+
+# Creating the plot for Fatalities
+plot_fatalities <- ggplot(data = districts_sf_joined, aes(fill = fatalities_per_accident)) +
+  geom_sf(color = 'black') +
+  geom_sf_label(aes(label = nom_districte), fill = "white",size = 1.5, label.padding = unit(0.25, "lines"), fontface = "bold") +
+  scale_fill_viridis(name = "Rate", option = "viridis", discrete = FALSE, labels = scales::comma) +
+  labs(title = "Fatalities per Accident") +
+  custom_theme()
+
+
+# Use the gridExtra package to arrange the plots
+grid.arrange(plot_fatalities, plot_serious_injuries, plot_minor_injuries, ncol = 3)
+
+
+
 ```
 
-Interestingly, the Nou Barris district has one of the lowest numbers of accidents, yet simultaneously records the highest level of injuries per accident. Similarly, Sant Marti had a comparatively low number of accidents, but the number of injuries per accident is high. Here, Eixample is in third place for the number of minor injuries per accident.
+The above maps provide the impact of traffic accidents across Barcelona's districts. The maps suggest a not linear relationship between the frequency of accidents and the severity of their consequences.
 
+Observing Nou Barris, the data paints a paradoxical picture: despite registering a lower number of accidents, the district has a notably higher rate of injuries per accident. This stark contrast implies that while accidents are infrequent, they may tend to be of a severe nature when they do occur.
 
-## 2. Identifying contributing factors
+Sant Marti tells a similar story, with fewer accidents overall yet a high rate of injuries per incident. The high injury rate despite lower accident numbers may point to specific risk factors in Sant Marti that increase the likelihood of more severe outcomes when accidents take place.
+
+What becomes evident from these visualizations is that the frequency of accidents does not directly correlate with their severity. A district like Eixample can have numerous accidents with less severe outcomes, whereas districts like Nou Barris and Sant Marti, with fewer accidents, can still experience a greater impact per accident. This suggests that district-specific factors—possibly including road design, traffic flow, and local enforcement of safety measures significantly influence the nature and consequences of traffic incidents. 
+
+# 5.  Identifying contributing factors
 
 This section focuses on potential factors contributing to the rise in the number of accidents and victims in Barcelona. We investigate seasonal variations in accident rates, examine the proximity of accidents to crosswalks, and assess the influence of traffic levels on incident occurrence.
 
-
-### Unveiling seasonal trends
+## 5.1. Unveiling seasonal trends
 
 Delving into temporal patterns, we explore how the occurrence of accidents fluctuates throughout the day and across different months.
 
-#### Time of the day
+### 5.1.1. Time of the day
 
 ```{r }
 # Number of accidents by hour
@@ -325,7 +403,7 @@ ggplot(accidents_agg_names, aes(x = Hora_dia, y = total_accidents, color = facto
 
 As expected, the number of accidents decreases during the night. Notably, in Eixample, the number of accidents during the night is much lower than during the day and is comparable to the levels in other districts. Interestingly, in Eixample, the number of accidents decreases at 15:00 and then rises again, reaching its peak at 18:00. The highest number of accidents in 2023 occurred at 14:00. It turns out that, generally, there are fewer accidents at 15:00 compared to the hours immediately before and after it.
 
-#### Month
+### 5.1.2. Month
 
 ```{r }
 # Number of accidents by month
@@ -373,10 +451,15 @@ ggplot(accidents_agg_names_month, aes(x = Mes_any, y = total_accidents, color = 
   theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
 ```
 
-In general, it's observed that the summer months consistently record the highest number of accidents. Moreover, when analyzing the data across various districts, the monthly trends in accident occurrences appear to follow a similar pattern.
+In the above plots examining the seasonal trends of traffic accidents within Barcelona, an increase in accidents is identified during the summer months. The research postulated that this amplification was concomitant with the influx of tourists and subsequent vehicular congestion, typical of the warmer season.
 
+While a universal pattern is discernible, the magnitude of the summer augmentation in accident incidence is not the same at every district level, hinting at unique risk factors that influence each district.
 
-### Proximity to crosswalks
+An analysis of the monthly distribution of traffic incidents across various districts revails that certain districts, notably the Eixample district, were markedly more prone to incident amplification.
+
+These findings emphasize the importance of targeted interventions to address unique risk factors in different parts of the city, ultimately enhancing overall road safety measures.
+
+## 5.2. Proximity to crosswalks
 
 By analyzing the distance between accident locations and nearby crosswalks, we aim to uncover any correlations between accident frequency and the presence of pedestrian infrastructure.
 
@@ -416,8 +499,7 @@ upper_bound <- q3 + 1.5 * iqr
 accidents_sf_trimmed <- subset(accidents_sf, closest_crosswalk_distance >= lower_bound & closest_crosswalk_distance <= upper_bound)
 ```
 
-
-Now, let's check for a potential relationship between the number of accidents and the average closest distance to crosswalks at the neighborhood level. We are utilizing neighborhoods instead of districts here for a lower granularity level, thereby yielding more precise results.
+Let's check for a potential relationship between the number of accidents and the average closest distance to crosswalks at the neighborhood level. We are utilizing neighborhoods instead of districts here for a lower granularity level, thereby yielding more precise results.
 
 ```{r }
 # Group data by Codi_barri and calculate count of accidents and average closest_crosswalk_distance
@@ -449,7 +531,7 @@ summary(linear_model)
 Based on the results of the linear regression above, the coefficient for avg_distance is negative (-2.812), indicating that, on average, as the average distance to the closest crosswalk increases, the number of accidents in the neighborhood decreases (significant at the 5% significance level). This suggests that, according to the model, areas closer crosswalks tend to have more car accidents. However, it's essential to interpret this result with caution and remember that factors such as road conditions, traffic flow, visibility, and driver behavior may also play significant roles in accident occurrence.
 
 
-### Impact of traffic levels
+## 5.3. Impact of traffic levels
 
 We investigate the relationship between traffic volumes and the likelihood of accidents, examining how congestion levels may contribute to road safety challenges. Due to the large size of the traffic data and computational constraints, we utilize traffic data for January 2023 only.
 
@@ -477,7 +559,7 @@ streets_data_sf <- st_sf(streets_data, geometry = st_sfc(streets_data$geometry, 
 streets_within_city_limits <- st_intersection(streets_data_sf, st_union(districts_sf))
 
 # Load the traffic dataset into a dataframe
-traffic_flow <- read_csv("Traffic/2023_01_Gener_TRAMS_TRAMS.csv", show_col_types = FALSE)
+traffic_flow <- read_csv("/Users/ruimaciel/Desktop/Barcelona/Geospatial/Traffic/2023_01_Gener_TRAMS_TRAMS.csv", show_col_types = FALSE)
 
 # Convert the data column to character for datetime parsing
 traffic_flow$data <- as.character(traffic_flow$data)
@@ -494,19 +576,21 @@ traffic_january <- traffic_flow %>%
   group_by(idTram) %>%
   summarise(average_state = mean(estatActual, na.rm = TRUE), .groups = 'drop')
 
-# Assuming you have an sf object with street segments called street_segments_sf and it has a column named idTram
 # Merge the traffic data with the street segments data
 streets_data_traffic <- merge(streets_within_city_limits, traffic_january, by.x = "Tram", by.y = "idTram")
 
 ggplot(data = streets_data_traffic) +
   geom_sf(aes(color = average_state)) +
   scale_color_gradient(low = "lightblue", high = "darkred") + # Custom color scale
+  geom_sf(data = districts_sf, color = 'black', fill = NA, alpha=0.1) +  # Plot districts
   theme_minimal() +
   labs(title = "Traffic Intensity Map", 
        color = "Average Traffic State") +
   theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
 ```
+The map doesn't encompass every street in Barcelona. However it capturs most of the city's major route.
 
+From our earlier findings and descriptions, there is an argument to explore whether the significant traffic congestion along Avenida Diagonal, particularly within Eixample, is correlated with the number of accidents.  Moreover, we can correlate locations of previous accidents with the roads depicted on this map, such as the clear depiction of the B20 on the outskirts of Barcelona. This leads us to consider whether there's a correlation between traffic density and the number of accidents, which we will explore now.
 
 ```{r}
 # Filter the dataframe where 'nom_mes' equals 1
@@ -535,7 +619,6 @@ accidents_count_per_street_df$accident_count[is.na(accidents_count_per_street_df
 
 accidents_with_traffic_per_street <- accidents_count_per_street_df %>%
   left_join(traffic_january, by = c("Tram" = "idTram"))
-
 
 # Convert back to sf using the original geometry from 'streets_within_city_limits'
   accidents_count_per_street <- st_as_sf(accidents_count_per_street_df, geometry = st_geometry(streets_within_city_limits), crs = st_crs(streets_within_city_limits))
@@ -568,10 +651,11 @@ ggplot(fitted_values, aes(x = average_state, y = accident_count)) +
   theme_minimal() # A minimal theme for a cleaner look
 ```
 
-Based on the model and chart presented above, we can say that in Barcelona, at the 1% significance level there exists evidence that increased traffic levels are associated with a higher number of accidents.
+Based on the model and chart presented above, we can say that in Barcelona, at the 1% significance level there exists evidence that increased traffic levels are associated with a higher number of accidents. Specifically, for every unit increase in the average state of a given street, there is, on average, a corresponding rise of 0.26 accidents, holding all other factors constant. We did the computation with robust standard erros to ensure homoscedasticity. 
 
+# 6. Regression Analysis: Predicting Victim Numbers
 
-## 3. Regression Analysis: Predicting Victim Numbers
+Having identified factors that correlate with accidents when considered individually, we now shift our focus to the victims, integrating some of the data examined in the previous section.
 
 In this section, we employ linear regression analysis to identify variables that may influence the number of victims involved in car accidents. By considering factors explored in the previous sections as predictor variables, we aim to discern patterns and relationships that can inform strategies for mitigating accident severity and reducing human casualties.
 
@@ -604,7 +688,6 @@ model <- lm(victims_number ~ Nom_districte + Hora_dia + avg_closest_distance + a
 summary(model)
 ```
 
-
 The linear regression model indicates that the total number of victims (Y) is influenced by several factors. Here's a summary interpretation:
 
 - Nom_districte (Districts): The coefficients for different districts indicate the change in the number of victims compared to a reference district. For instance, a coefficient of -0.17 for "Les Corts" district suggests that, on average, there are approximately -0.17 fewer victims in this district compared to the reference district when other variables are held constant. However, district coefficients are not statistically significant (p > 0.05), indicating that district alone might not be a strong predictor of the number of victims.
@@ -619,14 +702,30 @@ The linear regression model indicates that the total number of victims (Y) is in
 Overall, the model has a low adjusted R-squared value of 0.01632, suggesting that the predictors included in the model explain only a small portion of the variance in the total number of victims. Further exploration and refinement of the model may be necessary to better understand the factors influencing the total number of victims in accidents.
 
 
-## Conclusions
 
-Our research journey through Barcelona's road safety landscape has shed light on crucial insights that can inform policy-making and urban planning attempts.Through the analysis of geospatial data, we identified spatial and temporal determinants of car accidents, offering actionable insights for enhancing road safety strategies.
+# 7. Conclusions
 
-The spatial distribution of accidents, highlighted through maps and heatmaps, revealed hotspots and high-risk areas, emphasizing the need for targeted interventions. Surprisingly, districts with the highest accident counts did not necessarily exhibit the highest fatality rates, indicating the importance of complex approaches to address different injury severities.
+Our exploration into Barcelona's road safety has revealed some geospatial patterns that can foster furter research in order to shape effective policies. Delving into geospatial data, we identified both the spatial and temporal patterns that underscore car accidents in Barcelona, providing a foundation for developing targeted road safety strategies.
 
-Temporal trends unveiled a relationship between accident occurrence and various factors such as time of day and month, underscoring the importance of temporal considerations in road safety planning. The regression analysis further elucidated the impact of factors like proximity to crosswalks and traffic levels on accident occurrence, providing evidence-based guidance for interventions.
+The distribution of accidents across the city, particularly spotlighting hotspots such as Eixample, and contrasting these with the severity of outcomes in different districts, underscores a nuanced landscape. Eixample, containing key transit routes like Avenida Diagonal and Gran Via de les Corts Catalanes, emerges as a primary locus of incidents. Yet, its high incident rate doesn't necessarily correlate with the most severe outcomes. This complexity suggests that a multi-faceted approach, considering unique district characteristics from road design to traffic management, is crucial for addressing the spectrum of road safety challenges.
 
-While the regression model offered insights into the predictors of the total number of victims, its modest explanatory power suggests the presence of unaccounted factors influencing road safety outcomes. Thus, ongoing research efforts and data-driven initiatives are essential to refine models and develop holistic strategies for fostering a safer urban environment in Barcelona and beyond.
+Temporal patterns offer additional dimensions to this narrative, revealing the interplay between accident frequencies and various factors, including time of day and seasonal trends. The notable summertime spike in accidents, attributed to the influx of tourists and increased vehicular load, calls for adaptable safety measures that respond to these temporal shifts.
 
-In essence, our findings underscore the significance of interdisciplinary collaborations, data-driven decision-making, and community engagement in mitigating road safety challenges and realizing our collective vision of safer streets for all.
+Our regression analysis further clarifies the factors influencing accident rates and the number of victims, highlighting intriguing correlations such as the negative relationship between accidents and the distance to crosswalks, and the positive association between traffic levels and accidents. These insights, while informative, also hint at the complexity of road safety dynamics, advocating for continued research and refined analytical models.
+
+Lastly, our attempt at explaining the factors that impact victims revealed that the specific district has a minimal and statistically insignificant effect on the number of accident victims, suggesting that location alone may not strongly predict accident severity. Time of day was found to have a slight but statistically significant impact, indicating that accidents later in the day might slightly increase the number of victims. Distance from crosswalks also showed a significant but very small increase in victim numbers, pointing towards a marginal increase in risk with greater distance from pedestrian safety infrastructure. Traffic levels, however, did not significantly influence victim counts. Overall, the model suggests that these factors combined explain only a small fraction of the variation in the number of accident victims, highlighting the need for further investigation into other potential influences.
+
+The results underscore the complexity involved in enhancing urban safety, emphasizing the need for collaborative efforts across various fields. Merging analytical findings, especially the significance of geospatial characteristics, with unified initiatives from policymakers, urban planners, and community stakeholders, enables the identification of specific high-risk areas as well as the potential for broad safety improvements throughout the city. The application of geospatial analysis is crucial for creating focused and impactful road safety strategies. This approach becomes a central element for future investigations and policy-making processes, aimed at fostering safer urban spaces.
+
+
+# Bibliography 
+
+Chaudhuri, S., Saez, M., Varga, D., & Juan, P. (2023). Spatiotemporal modeling of traffic risk mapping: A study of urban road networks in Barcelona, Spain. *Spatial Statistics, 53*, 100722. https://doi.org/10.1016/j.spasta.2022.100722
+
+Haybat, H., Zerenoğlu, H., & Özlü, T. (2022). Temporal and spatial analysis of traffic accidents: the case of Bursa city. *International Journal of Geography and Geography Education (IGGE), 45*, 404-423. http://dx.doi.org/10.32003/igge.1016204
+
+Lović Obradović, S., Rabiei-Dastjerdi, H., & Matović, S. (2022). Identifying spatiotemporal variability of traffic accident mortality: Evidence from the City of Belgrade, Serbia. *Central European Journal of Geography and Sustainable Development, 4(2), 78-93*. https://doi.org/10.47246/CEJGSD.2022.4.2.5
+
+Mesquitela, J., Elvas, L. B., Ferreira, J. C., & Nunes, L. (2022). Data analytics process over road accidents data—A case study of Lisbon city. *ISPRS International Journal of Geo-Information, 11(2)*, 143. https://doi.org/10.3390/ijgi11020143
+
+Shi, Y., Kilberry, M., Kharude, S., Biswas, R., Oram, J., Rao, D., Noori, M., Mays, J., & Chen, X. (2021). Predicting road accident risk using geospatial data and machine learning (Demo paper). In *SIGSPATIAL '21: ACM SIGSPATIAL International Conference on Advances in Geographic Information Systems, November 02–05, 2021, Beijing, China*. ACM, New York, NY, USA, 4 pages. https://doi.org/10.1145/3474717.3484253
