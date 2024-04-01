@@ -20,8 +20,6 @@ Our investigation revealed compelling insights into Barcelona's road safety land
    2. Exploring accident severity
 5. Identifying contributing factors 
    1. Unveiling seasonal trends 
-   2. Time of the day 
-   3. Month 
    4. Proximity to crosswalks 
    5. Impact of traffic levels
 6. Regression Analysis: Predicting Victim Numbers
